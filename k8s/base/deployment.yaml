@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sample-test
+spec:
+  replicas: 8
+
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 3
+      maxSurge: 2
+
+  selector:
+    matchLabels:
+      app: sample-test
+
+  template:
+    metadata:
+      labels:
+        app: sample-test
+
+    spec:
+      priorityClassName: high-priority-app
+
+      containers:
+      - name: sample-test
+        image: 758024567313.dkr.ecr.us-east-1.amazonaws.com/sample-test:latest
+        ports:
+        - containerPort: 8080
+
+        resources:
+          requests:
+            cpu: "250m"
+            memory: "256Mi"
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
+
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 8080
+
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 8080
